@@ -1,16 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-
+<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <Nullable>enable</Nullable>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <PackageProjectUrl>https://github.com/penguincms/Penguin.Cms.Modules.Reporting</PackageProjectUrl>
+    <Version>1.0.0</Version>
+    <Description>Not Available</Description>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Remove="wwwroot\**\*" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\**\*" />
   </ItemGroup>
@@ -29,6 +29,5 @@
     <ProjectReference Include="..\Penguin.Cms.Modules.Admin\Penguin.Cms.Modules.Admin.csproj" />
     <ProjectReference Include="..\Penguin.Cms.Modules.Dynamic\Penguin.Cms.Modules.Dynamic.csproj" />
   </ItemGroup>
-
-
+  <Import Project="Penguin.Projects.Shared\Penguin.Projects.Shared.csproj" />
 </Project>

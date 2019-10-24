@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <Nullable>enable</Nullable>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot\**\*" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.0.0" />
+    <PackageReference Include="Penguin.Cms.Reporting" Version="1.0.0" />
+    <PackageReference Include="Penguin.Cms.Web" Version="1.0.0" />
+    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.0" />
+    <PackageReference Include="Penguin.Reflection.Dynamic" Version="1.0.0" />
+    <PackageReference Include="Penguin.Shared.Objects" Version="2.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Penguin.Cms.Modules.Admin\Penguin.Cms.Modules.Admin.csproj" />
+    <ProjectReference Include="..\Penguin.Cms.Modules.Dynamic\Penguin.Cms.Modules.Dynamic.csproj" />
+  </ItemGroup>
+
+
+</Project>

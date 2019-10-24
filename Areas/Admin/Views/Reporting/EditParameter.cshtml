@@ -1,0 +1,187 @@
+﻿@model ParameterEditDisplayModel
+
+@using Penguin.Reflection.Serialization.Abstractions.Interfaces;
+@using Penguin.Reflection;
+@using Penguin.Reflection.Serialization.Objects;
+@using Penguin.Persistence.Database;
+
+@{
+    Layout = "_Layout";
+
+    System.Type thisType = TypeConverter.ToNetType(Model.SQLParameterInfo.DATA_TYPE);
+
+    Html.IncludeJS("/lib/CodeMirror/lib/codemirror",
+               "/lib/CodeMirror/mode/sql/sql",
+               "/lib/CodeMirror/mode/clike/clike");
+    Html.IncludeCSS("/lib/CodeMirror/lib/codemirror");
+
+    Func<ParameterConstraint, string, IHtmlContent> RenderConstraint = this.Helper((ParameterConstraint constraint, string PropertyName) =>
+
+    @<text>
+
+        <div class="parameterConstraint" data-propertyname="@PropertyName" onchange="UpdateValue('@PropertyName')">
+            <property data-editable="True">
+                <name>
+                    Enabled
+                </name>
+                <value>
+                    @Html.CheckBox(PropertyName + ".Enabled", constraint.Enabled)
+                </value>
+            </property>
+
+            <property data-editable="True">
+                <name>
+                    Constraint Type
+                </name>
+                <value>
+                    <select name="@(PropertyName).Type" class="constraintType">
+                        @foreach (ParameterConstraint.ConstraintType type in Enum.GetValues(typeof(ParameterConstraint.ConstraintType)))
+                        {
+                        <!option value="@((int)type)" @Html.Attribute("selected", type == constraint.Type)>@type</!option>
+                        }
+                    </select>
+                </value>
+            </property>
+
+            <property data-editable="True" data-type="Static" class="valueSelector">
+                <name>
+                    Value
+                </name>
+                <value>
+                    @{
+                        MetaObject meta = new MetaObject();
+                        meta.Type = new MetaType(thisType, null);
+                        meta.Value = constraint.Type == ParameterConstraint.ConstraintType.Static ? constraint.Value : null;
+                        meta.Property = new MetaProperty()
+                        {
+                            Type = meta.Type,
+                            Name = PropertyName + ".Value"
+                        };
+
+                        EditorHandlerResult result = DynamicEditorService.FindHandler(meta, DisplayContexts.Edit);
+
+                        if (result is DynamicViewResult dr)
+                        {
+                                <partial name="@dr.ViewPath" model="meta" />
+                        }
+
+                        }
+                </value>
+            </property>
+        </div>
+
+        <property data-editable="True" data-type="SQL" class="valueSelector">
+            <name>
+                Query
+            </name>
+            <value>
+                <textarea name="@(PropertyName).Value" id="code-sql@(PropertyName)">@constraint.Value</textarea>
+            </value>
+        </property>
+
+        <property data-editable="True" data-type="Lambda" class="valueSelector">
+            <name>
+                Function (Action&lt;T&gt;)
+            </name>
+            <value>
+                <textarea name="@(PropertyName).Value" id="code-csharp@(PropertyName)">@constraint.Value</textarea>
+            </value>
+        </property>
+        <script>
+        UpdateValue('@PropertyName');
+
+        // Setup JS code editor
+        var textarea_sql = document.getElementById("code-sql@(PropertyName)");
+        var codemirror_sql = CodeMirror.fromTextArea(textarea_sql, {
+            mode: 'text/x-mssql',
+            lineNumbers: true
+        });
+        codemirror_sql.setSize(null, 150);
+
+        // Setup csharp code editor
+        var textarea_csharp = document.getElementById("code-csharp@(PropertyName)");
+        var codemirror_csharp = CodeMirror.fromTextArea(textarea_csharp, {
+            mode: 'text/x-csharp',
+            lineNumbers: true
+        });
+        codemirror_csharp.setSize(null, 150);
+        </script>
+    </text>);
+}
+
+<script>
+    function UpdateValue(PropertyName) {
+        var prop = $('[data-propertyname="' + PropertyName + '"]').closest('property');
+
+        var selectedText = prop.find('.constraintType option:selected').text();
+
+        prop.find('.valueSelector').each(function (i, e) {
+            if ($(e).attr('data-type') == selectedText) {
+                $(e).show();
+                $(e).find('input, textarea').removeAttr('disabled');
+            } else {
+                $(e).hide();
+                $(e).find('input, textarea').attr('disabled', 'disabled');
+            }
+
+        });
+    }
+</script>
+<form action="@this.Context.Request.Path.Value" method="Post">
+
+    @Html.HiddenFor(r => r.ParameterInfo.ParameterName)
+    @Html.HiddenFor(r => r.ParameterInfo.ProcedureName)
+
+    <property data-editable="True">
+        <name>
+            Minimum Value
+        </name>
+        <value>
+            @RenderConstraint(Model.ParameterInfo.MinValue, "ParameterInfo.MinValue")
+        </value>
+    </property>
+
+    <property data-editable="True">
+        <name>
+            Maximum Value
+        </name>
+        <value>
+            @RenderConstraint(Model.ParameterInfo.MaxValue, "ParameterInfo.MaxValue")
+        </value>
+    </property>
+
+    <property data-editable="True">
+        <name>
+            Default Value
+        </name>
+        <value>
+            @RenderConstraint(Model.ParameterInfo.Default, "ParameterInfo.Default")
+        </value>
+    </property>
+
+    <button>Submit</button>
+</form>
+
+@functions {
+
+    Dictionary<string, string> Views = new Dictionary<string, string>();
+
+    HtmlString JoinAttributes(Dictionary<string, object> Attributes)
+    {
+        string attributeString = " ";
+
+        foreach (KeyValuePair<string, object> attribute in Attributes)
+        {
+            if (attribute.Value is null)
+            {
+                attributeString = $" data-{attribute.Key}{attributeString}";
+            }
+            else
+            {
+                attributeString = $" data-{attribute.Key}=\"{attribute.Value}\"{attributeString}";
+            }
+        }
+
+        return new HtmlString(attributeString);
+    }
+}

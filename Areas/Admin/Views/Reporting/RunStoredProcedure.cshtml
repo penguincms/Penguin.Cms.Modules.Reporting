@@ -1,0 +1,24 @@
+﻿@using Penguin.Reflection.Serialization.Extensions;
+@using Penguin.Persistence.Abstractions.Attributes.Rendering;
+
+@model StoredProcedureDisplayModel
+
+@{
+    Layout = null;
+    Model.Parameters.AddAttribute<DisplayAttribute>("GroupName", "grid");
+}
+
+<root>
+    <!form id="validateWrapper">
+        @if (Model.Parameters.Properties.AnyNotNull())
+        {
+            <partial name="Edit" model="Model.Parameters" />
+        }
+    </!form>
+
+    <partial name="~/Areas/Admin/Views/Render/PagedList.cshtml" model="Model.Results" />
+
+    <script>
+        $('button').button();
+    </script>
+</root>

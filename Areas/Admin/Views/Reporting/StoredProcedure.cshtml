@@ -1,0 +1,35 @@
+﻿@using Penguin.Reflection.Serialization.Extensions;
+@using Penguin.Persistence.Abstractions.Attributes.Rendering;
+
+@model StoredProcedureDisplayModel
+
+@{
+    Layout = "_Layout";
+    Model.Parameters.AddAttribute<DisplayAttribute>("GroupName", "grid");
+}
+
+<h3 class="reportTitle">
+    @Model.Name
+
+    @if (!Model.Optimized)
+    {
+    <span style="color:red;" class="tooltip">
+        @Html.MaterialIcon("warning")
+        <span class="tooltiptext">
+            Procedure can be optimized by adding count/page parameters
+        </span>
+    </span>
+
+    }
+</h3>
+
+<!form id="validateWrapper" data-isroot="True">
+    @if (Model.Parameters.Properties.AnyNotNull())
+    {
+        <partial name="Edit" model="Model.Parameters" />
+    }
+</!form>
+
+<button type="button" onclick="Meta.Submit('/Admin/Reporting/RunStoredProcedure?Name=@Model.Name.Replace("\\", "\\\\")', 'validateWrapper', true); $(this).text('Update')">
+    Run
+</button>

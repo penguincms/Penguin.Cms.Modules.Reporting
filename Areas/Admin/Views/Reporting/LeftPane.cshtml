@@ -1,0 +1,99 @@
+﻿@using Penguin.Persistence.Database;
+@using Penguin.Persistence.Database.Objects;
+
+@{
+    Guid treeGuid = Guid.NewGuid();
+
+    DatabaseInstance ReportingDatabase = new DatabaseInstance(ConfigurationProvider.ConnectionStringOrConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING));
+
+    IEnumerable<StoredProcedureTreeDisplayModel> models = ReportingDatabase.GetStoredProcedures()
+                                                 .Where(s => s.StartsWith("Reports"))
+                                                 .Select(s => new StoredProcedureTreeDisplayModel() { Name = s })
+                                                 .ToList();
+
+    foreach (StoredProcedureTreeDisplayModel treeModel in models)
+    {
+        treeModel.Parameters.AddRange(ReportingDatabase.GetParameters(treeModel.Name));
+    }
+
+    TreeNode<StoredProcedureTreeDisplayModel> StoredProcedures = models.ToTree(x => x.Name);
+
+    Func<TreeNode<StoredProcedureTreeDisplayModel>, IHtmlContent> Render = null;
+
+    Render = this.Helper((TreeNode<StoredProcedureTreeDisplayModel> Procedure) =>
+    @<text>
+        @{
+        string Icon = string.Empty;
+
+        if (Procedure.HasChildren)
+        {
+            Icon = "folder";
+        }
+        else
+        {
+            Icon = "settings";
+        }
+        }
+        <li data-jstree='{"icon":"/Images/Material Icons/web/ic_@(Icon)_white_18dp.png"}'>
+
+            @if (Procedure.IsReal)
+            {
+            <a href="/Admin/Reporting/StoredProcedure?Name=@Procedure.Value.Name">@Procedure.Name</a>
+            }
+            else
+            {
+            <span>@Procedure.Name</span>
+            }
+
+            @if (Procedure.HasChildren)
+            {
+            <ul>
+                @foreach (TreeNode<StoredProcedureTreeDisplayModel> thisChild in Procedure.Children.OrderBy(p => { return !p.HasChildren; }).ThenBy(p => { return p.Name; }))
+                    {
+                @Render(thisChild)
+                    }
+            </ul>
+            }
+            else if (Procedure?.Value?.Parameters?.AnyNotNull() ?? false)
+            {
+            <ul>
+                @foreach (SQLParameterInfo thisChild in Procedure.Value.Parameters.OrderBy(p => p.ORDINAL_POSITION))
+                    {
+                <li data-jstree='{"icon":"/Images/Material Icons/web/ic_input_white_18dp.png"}'>
+                    <a href="/Admin/Reporting/EditParameter?Name=@Procedure.Value.Name&Parameter=@thisChild.PARAMETER_NAME">@thisChild.PARAMETER_NAME</a>
+                </li>
+                    }
+            </ul>
+            }
+        </li>
+    </text>);
+}
+
+<div id="@treeGuid">
+    <ul>
+        @Render(StoredProcedures)
+    </ul>
+</div>
+<script>
+	$('#@treeGuid')
+		.jstree({
+			core: {
+				dblclick_toggle: false,
+				themes: {
+					name: "default-dark",
+					dots: true,
+					icons: true,
+					variant: "large"
+				}
+			}
+		});
+
+	$('#@treeGuid').on("activate_node.jstree", function (e, data) {
+		if (data.node.a_attr.href === '#') {
+			data.instance.toggle_node(data.node);
+		} else {
+			Site.ShowLoader();
+			window.location.href = data.node.a_attr.href;
+		}
+	});
+</script>

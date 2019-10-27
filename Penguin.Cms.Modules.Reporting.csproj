@@ -10,7 +10,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="wwwroot\**\*" />
-    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.0-63707630128" />
+    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.0-T9LXGUJ" />
+    <PackageReference Include="Penguin.Cms.Reporting" Version="1.0.0-T9LXGUJ" />
+    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.0-T9LXGUJ" />
+    <PackageReference Include="Penguin.Reflection.Dynamic" Version="1.0.0-T9LXGUJ" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\**\*" />
@@ -20,11 +23,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.0.0" />
-    <PackageReference Include="Penguin.Cms.Reporting" Version="1.0.0" />
-    <PackageReference Include="Penguin.Cms.Web" Version="1.0.0" />
-    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.0" />
-    <PackageReference Include="Penguin.Reflection.Dynamic" Version="1.0.0" />
-    <PackageReference Include="Penguin.Shared.Objects" Version="2.0.1" />
   </ItemGroup>
   <Import Project="Penguin.Projects.Shared\Penguin.Projects.Shared.csproj" />
 </Project>

@@ -13,9 +13,9 @@
   <ItemGroup>
     <Content Remove="wwwroot\**\*" />
     <PackageReference Include="Penguin.Cms.Reporting" Version="1.0.1-T9M3AAF" />
-    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.1-T9M3AAF" />
     <PackageReference Include="Penguin.Reflection.Dynamic" Version="1.0.1-T9M3AAF" />
-    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.1-T9M3AAF" />
+    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.1-T9M4A3K" />
+    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.1-T9M4EL7" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\**\*" />

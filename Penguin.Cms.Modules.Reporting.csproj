@@ -7,13 +7,15 @@
     <PackageProjectUrl>https://github.com/penguincms/Penguin.Cms.Modules.Reporting</PackageProjectUrl>
     <Version>1.0.0</Version>
     <Description>Not Available</Description>
+    <AssemblyName>Penguin.Cms.Modules.Reporting</AssemblyName>
+    <RootNamespace>Penguin.Cms.Modules.Reporting</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="wwwroot\**\*" />
-    <PackageReference Include="Penguin.Cms.Reporting" Version="1.0.1-T9M1HHH" />
-    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.1-T9M1HHH" />
-    <PackageReference Include="Penguin.Reflection.Dynamic" Version="1.0.1-T9M1HHH" />
-    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.1-T9M1K2Y" />
+    <PackageReference Include="Penguin.Cms.Reporting" Version="1.0.1-T9M2XAX" />
+    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.1-T9M2XAX" />
+    <PackageReference Include="Penguin.Reflection.Dynamic" Version="1.0.1-T9M2XAX" />
+    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.1-T9M2XAX" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\**\*" />

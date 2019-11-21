@@ -2,18 +2,33 @@
 @using Penguin.Persistence.Database.Objects;
 
 @{
-    Guid treeGuid = Guid.NewGuid();
+    string cString = string.Empty;
+    Guid treeGuid = Guid.Empty;
+    IEnumerable<StoredProcedureTreeDisplayModel> models = new List<StoredProcedureTreeDisplayModel>();
 
-    DatabaseInstance ReportingDatabase = new DatabaseInstance(ConfigurationProvider.ConnectionStringOrConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING));
-
-    IEnumerable<StoredProcedureTreeDisplayModel> models = ReportingDatabase.GetStoredProcedures()
-                                                 .Where(s => s.StartsWith("Reports"))
-                                                 .Select(s => new StoredProcedureTreeDisplayModel() { Name = s })
-                                                 .ToList();
-
-    foreach (StoredProcedureTreeDisplayModel treeModel in models)
+    try
     {
-        treeModel.Parameters.AddRange(ReportingDatabase.GetParameters(treeModel.Name));
+        cString = ConfigurationProvider.ConnectionStringOrConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING);
+
+        treeGuid = Guid.NewGuid();
+
+        DatabaseInstance ReportingDatabase = new DatabaseInstance(cString);
+
+        models = ReportingDatabase.GetStoredProcedures()
+                                                     .Where(s => s.StartsWith("Reports"))
+                                                     .Select(s => new StoredProcedureTreeDisplayModel() { Name = s })
+                                                     .ToList();
+
+        foreach (StoredProcedureTreeDisplayModel treeModel in models)
+        {
+            treeModel.Parameters.AddRange(ReportingDatabase.GetParameters(treeModel.Name));
+        }
+    } catch(Exception ex)
+    {
+        <text>An error occurred connecting to the database @cString </text>
+
+        ErrorRepository.TryAdd(ex);
+        return;
     }
 
     TreeNode<StoredProcedureTreeDisplayModel> StoredProcedures = models.ToTree(x => x.Name);

@@ -9,16 +9,15 @@
 }
 
 <root>
-    <!form id="validateWrapper">
+    <!form id="validateWrapper" data-isroot="True">
         @if (Model.Parameters.Properties.AnyNotNull())
         {
             <partial name="Edit" model="Model.Parameters" />
         }
+
+        <partial name="~/Areas/Admin/Views/Render/PagedList.cshtml" model="Model.Results" />
     </!form>
-
-    <partial name="~/Areas/Admin/Views/Render/PagedList.cshtml" model="Model.Results" />
-
-    <script>
-        $('button').button();
-    </script>
 </root>
+<script>
+    $('button').button();
+</script>

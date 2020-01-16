@@ -23,12 +23,14 @@
     }
 </h3>
 
-<!form id="validateWrapper" data-isroot="True">
-    @if (Model.Parameters.Properties.AnyNotNull())
-    {
-        <partial name="Edit" model="Model.Parameters" />
-    }
-</!form>
+<root>
+    <!form id="validateWrapper" data-isroot="True">
+        @if (Model.Parameters.Properties.AnyNotNull())
+        {
+            <partial name="Edit" model="Model.Parameters" />
+        }
+    </!form>
+</root>
 
 <button type="button" onclick="Meta.Submit('/Admin/Reporting/RunStoredProcedure?Name=@Model.Name.Replace("\\", "\\\\")', 'validateWrapper', true); $(this).text('Update')">
     Run

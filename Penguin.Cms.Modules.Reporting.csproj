@@ -15,8 +15,8 @@
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.1" />
     <PackageReference Include="Penguin.Reflection.Dynamic" Version="1.0.1-T9QC72V" />
     <PackageReference Include="Penguin.Cms.Reporting" Version="1.0.1-T9QC72V" />
-    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.1-T9QC72V" />
-    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.1-T9QC72V" />
+    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.1-T9QE7NI" />
+    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.1-T9QE7NI" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\**\*" />

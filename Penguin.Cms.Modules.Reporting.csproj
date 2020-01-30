@@ -9,14 +9,15 @@
     <Description>Not Available</Description>
     <AssemblyName>Penguin.Cms.Modules.Reporting</AssemblyName>
     <RootNamespace>Penguin.Cms.Modules.Reporting</RootNamespace>
+    <DocumentationFile>Penguin.Cms.Modules.Reporting.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="wwwroot\**\*" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.1" />
     <PackageReference Include="Penguin.Reflection.Dynamic" Version="1.0.1-T9QC72V" />
     <PackageReference Include="Penguin.Cms.Reporting" Version="1.0.1-T9QC72V" />
-    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.1-T9QE7NI" />
-    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.1-T9QE7NI" />
+    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.1-T9QP5HE" />
+    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.1-T9QP5HE" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\**\*" />

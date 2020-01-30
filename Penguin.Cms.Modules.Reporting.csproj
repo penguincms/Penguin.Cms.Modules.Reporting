@@ -13,11 +13,18 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="wwwroot\**\*" />
+<<<<<<< HEAD
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.1" />
     <PackageReference Include="Penguin.Reflection.Dynamic" Version="1.0.1-T9QUIQ4" />
     <PackageReference Include="Penguin.Cms.Reporting" Version="1.0.1-T9QUIQ4" />
     <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.1-T9QUIQ4" />
     <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.1-T9QUIQ4" />
+=======
+    <PackageReference Include="Penguin.Reflection.Dynamic" Version="1.0.1-T9MJL4F" />
+    <PackageReference Include="Penguin.Cms.Reporting" Version="1.0.1-T9MNBFG" />
+    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.1-T9P1VVS" />
+    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.1-T9Q96US" />
+>>>>>>> 7e07cd8c69a16d323eb0fbf93b39d43f4b50b338
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\**\*" />

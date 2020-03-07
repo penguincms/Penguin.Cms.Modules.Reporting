@@ -1,15 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Penguin.Cms.Modules.Admin.Areas.Admin.Controllers;
+using Penguin.Cms.Modules.Core.Models;
 using Penguin.Cms.Modules.Reporting.Areas.Admin.Models;
 using Penguin.Cms.Modules.Reporting.Constants.Strings;
+using Penguin.Cms.Reporting;
+using Penguin.Cms.Reporting.Extensions;
+using Penguin.Configuration.Abstractions.Extensions;
 using Penguin.Configuration.Abstractions.Interfaces;
 using Penguin.Persistence.Abstractions.Attributes.Validation;
 using Penguin.Persistence.Abstractions.Interfaces;
 using Penguin.Persistence.Database;
 using Penguin.Persistence.Database.Extensions;
 using Penguin.Persistence.Database.Objects;
-using Penguin.Cms.Reporting.Extensions;
 using Penguin.Persistence.Database.Serialization.Extensions;
 using Penguin.Reflection.Dynamic;
 using Penguin.Reflection.Serialization.Abstractions.Interfaces;
@@ -19,25 +22,21 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Penguin.Cms.Reporting;
-using Penguin.Cms.Modules.Core.Models;
-using Penguin.Configuration.Abstractions.Extensions;
 
 namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
 {
     public class ReportingController : AdminController
     {
+        private readonly DatabaseInstance ReportingDatabase;
         protected IProvideConfigurations ConfigurationService { get; set; }
 
         protected IRepository<ParameterInfo> ReportingParameterRepository { get; set; }
 
-        private readonly DatabaseInstance ReportingDatabase;
-
         public ReportingController(IProvideConfigurations configurationService, IRepository<ParameterInfo> reportingParameterRepository, System.IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            ConfigurationService = configurationService;
-            ReportingDatabase = new DatabaseInstance(ConfigurationService.ConnectionStringOrConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING));
-            ReportingParameterRepository = reportingParameterRepository;
+            this.ConfigurationService = configurationService;
+            this.ReportingDatabase = new DatabaseInstance(this.ConfigurationService.ConnectionStringOrConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING));
+            this.ReportingParameterRepository = reportingParameterRepository;
         }
 
         [HttpGet]
@@ -45,15 +44,15 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
         {
             ParameterEditDisplayModel model = new ParameterEditDisplayModel()
             {
-                ParameterInfo = ReportingParameterRepository.GetByProcedureAndName(Name, Parameter) ?? new ParameterInfo()
+                ParameterInfo = this.ReportingParameterRepository.GetByProcedureAndName(Name, Parameter) ?? new ParameterInfo()
                 {
                     ParameterName = Parameter,
                     ProcedureName = Name
                 },
-                SQLParameterInfo = ReportingDatabase.GetParameters(Name).First(p => p.PARAMETER_NAME == Parameter)
+                SQLParameterInfo = this.ReportingDatabase.GetParameters(Name).First(p => p.PARAMETER_NAME == Parameter)
             };
 
-            return View(model);
+            return this.View(model);
         }
 
         [HttpPost]
@@ -70,11 +69,11 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
                 throw new NullReferenceException("ParameterInfo can not be null");
             }
 
-            using (ReportingParameterRepository.WriteContext())
+            using (this.ReportingParameterRepository.WriteContext())
             {
-                model.SQLParameterInfo = ReportingDatabase.GetParameters(model.ParameterInfo.ProcedureName).First(p => p.PARAMETER_NAME == model.ParameterInfo.ParameterName);
+                model.SQLParameterInfo = this.ReportingDatabase.GetParameters(model.ParameterInfo.ProcedureName).First(p => p.PARAMETER_NAME == model.ParameterInfo.ParameterName);
 
-                ParameterInfo existing = ReportingParameterRepository.GetByProcedureAndName(model.ParameterInfo.ProcedureName, model.ParameterInfo.ParameterName);
+                ParameterInfo existing = this.ReportingParameterRepository.GetByProcedureAndName(model.ParameterInfo.ProcedureName, model.ParameterInfo.ParameterName);
 
                 if (existing is null)
                 {
@@ -87,10 +86,10 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
                     existing.Default = model.ParameterInfo.Default;
                 }
 
-                ReportingParameterRepository.AddOrUpdate(existing);
+                this.ReportingParameterRepository.AddOrUpdate(existing);
             }
 
-            return View(model);
+            return this.View(model);
         }
 
         public string? GetParamConstraint(ParameterConstraint source, System.Type type)
@@ -106,7 +105,7 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
             }
             else if (source.Type == ParameterConstraint.ConstraintType.SQL)
             {
-                return ReportingDatabase.ExecuteToTable(source.Value).GetSingle<string>();
+                return this.ReportingDatabase.ExecuteToTable(source.Value).GetSingle<string>();
             }
             else
             {
@@ -116,7 +115,7 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
 
         public ActionResult RunStoredProcedure(string Name, string json, int count = 20, int page = 0)
         {
-            List<SQLParameterInfo> parameters = ReportingDatabase.GetParameters(Name);
+            List<SQLParameterInfo> parameters = this.ReportingDatabase.GetParameters(Name);
 
             MetaObject toRender = parameters.ToMetaObject();
 
@@ -149,35 +148,35 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
             {
                 ((MetaObject)model.Parameters["@page"]).Value = $"{page}";
                 ((MetaObject)model.Parameters["@count"]).Value = $"{count}";
-                model.Results.Items.AddRange(ReportingDatabase.ExecuteStoredProcedureToTable(Name, model.Parameters.ToSqlParameters()).ToMetaObject().Cast<IMetaObject>());
+                model.Results.Items.AddRange(this.ReportingDatabase.ExecuteStoredProcedureToTable(Name, model.Parameters.ToSqlParameters()).ToMetaObject().Cast<IMetaObject>());
             }
             else
             {
-                List<IMetaObject> results = ReportingDatabase.ExecuteStoredProcedureToTable(Name, model.Parameters.ToSqlParameters()).ToMetaObject().Cast<IMetaObject>().ToList();
+                List<IMetaObject> results = this.ReportingDatabase.ExecuteStoredProcedureToTable(Name, model.Parameters.ToSqlParameters()).ToMetaObject().Cast<IMetaObject>().ToList();
                 model.Results.TotalCount = results.Count;
                 model.Results.Items.AddRange(results.Skip(page * count).Take(count));
             }
 
-            return View(model);
+            return this.View(model);
         }
 
         [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters")]
         public ActionResult StoredProcedure(string Name)
         {
-            List<SQLParameterInfo> parameters = ReportingDatabase.GetParameters(Name);
+            List<SQLParameterInfo> parameters = this.ReportingDatabase.GetParameters(Name);
 
             MetaObject toRender = parameters.ToMetaObject();
 
             foreach (SQLParameterInfo thisParam in parameters)
             {
-                ParameterInfo DBInstance = ReportingParameterRepository.GetByProcedureAndName(Name, thisParam.PARAMETER_NAME);
+                ParameterInfo DBInstance = this.ReportingParameterRepository.GetByProcedureAndName(Name, thisParam.PARAMETER_NAME);
                 System.Type netType = TypeConverter.ToNetType(thisParam.DATA_TYPE);
 
                 if (DBInstance != null)
                 {
                     if (DBInstance.Default != null)
                     {
-                        ((MetaObject)toRender[thisParam.PARAMETER_NAME]).Value = GetParamConstraint(DBInstance.Default, netType);
+                        ((MetaObject)toRender[thisParam.PARAMETER_NAME]).Value = this.GetParamConstraint(DBInstance.Default, netType);
                     }
 
                     if (DBInstance.MinValue is null)
@@ -197,12 +196,12 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
 
                         if (DBInstance.MinValue.Enabled)
                         {
-                            Min = GetParamConstraint(DBInstance.MinValue, netType);
+                            Min = this.GetParamConstraint(DBInstance.MinValue, netType);
                         }
 
                         if (DBInstance.MaxValue.Enabled)
                         {
-                            Max = GetParamConstraint(DBInstance.MaxValue, netType);
+                            Max = this.GetParamConstraint(DBInstance.MaxValue, netType);
                         }
 
                         RangeAttribute range = new RangeAttribute(netType, Min, Max);
@@ -240,7 +239,7 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
                 Optimized = parameters.Any(p => p.PARAMETER_NAME == "count") && parameters.Any(p => p.PARAMETER_NAME == "page")
             };
 
-            return View(model);
+            return this.View(model);
         }
     }
 }

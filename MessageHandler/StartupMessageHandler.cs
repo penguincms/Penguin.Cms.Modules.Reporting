@@ -3,9 +3,6 @@ using Penguin.Configuration.Abstractions.Interfaces;
 using Penguin.Messaging.Abstractions.Interfaces;
 using Penguin.Messaging.Application.Messages;
 using Penguin.Persistence.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Penguin.Cms.Modules.Reporting.MessageHandler
 {
@@ -16,17 +13,17 @@ namespace Penguin.Cms.Modules.Reporting.MessageHandler
 
         public StartupMessageHandler(IProvideConfigurations configurationProvider, PersistenceConnectionInfo connectionInfo)
         {
-            ConfigurationProvider = configurationProvider;
-            ConnectionInfo = connectionInfo;
+            this.ConfigurationProvider = configurationProvider;
+            this.ConnectionInfo = connectionInfo;
         }
 
         public void AcceptMessage(Startup message)
         {
-            string ReportingString = ConfigurationProvider.GetConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING);
+            string ReportingString = this.ConfigurationProvider.GetConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING);
 
             if (string.IsNullOrWhiteSpace(ReportingString))
             {
-                ConfigurationProvider.SetConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING, ConnectionInfo.ConnectionString);
+                this.ConfigurationProvider.SetConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING, this.ConnectionInfo.ConnectionString);
             }
         }
     }

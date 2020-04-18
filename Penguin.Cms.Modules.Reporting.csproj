@@ -14,10 +14,10 @@
   <ItemGroup>
     <Content Remove="wwwroot\**\*" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.1" />
-    <PackageReference Include="Penguin.Reflection.Dynamic" Version="1.0.1-T9UFJ6O" />
-    <PackageReference Include="Penguin.Cms.Reporting" Version="1.0.1-T9UFJ6O" />
-    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.1-T9UFJ6O" />
-    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.1-T9UFJ6O" />
+    <PackageReference Include="Penguin.Reflection.Dynamic" Version="1.0.1-T9UPDS1" />
+    <PackageReference Include="Penguin.Cms.Reporting" Version="1.0.1-T9UPDS1" />
+    <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="1.2.1-T9UPDS1" />
+    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="1.0.1-T9UPPFD" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\**\*" />

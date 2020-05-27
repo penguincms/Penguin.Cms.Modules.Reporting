@@ -18,6 +18,7 @@ using Penguin.Reflection.Dynamic;
 using Penguin.Reflection.Serialization.Abstractions.Interfaces;
 using Penguin.Reflection.Serialization.Constructors;
 using Penguin.Reflection.Serialization.Objects;
+using Penguin.Security.Abstractions.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -32,7 +33,7 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
 
         protected IRepository<ParameterInfo> ReportingParameterRepository { get; set; }
 
-        public ReportingController(IProvideConfigurations configurationService, IRepository<ParameterInfo> reportingParameterRepository, System.IServiceProvider serviceProvider) : base(serviceProvider)
+        public ReportingController(IProvideConfigurations configurationService, IRepository<ParameterInfo> reportingParameterRepository, System.IServiceProvider serviceProvider, IUserSession userSession) : base(serviceProvider, userSession)
         {
             this.ConfigurationService = configurationService;
             this.ReportingDatabase = new DatabaseInstance(this.ConfigurationService.ConnectionStringOrConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING));

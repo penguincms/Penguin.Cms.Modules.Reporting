@@ -1,6 +1,6 @@
 ﻿using Penguin.Cms.Modules.Core.Models;
+using Penguin.Persistence.Database.Serialization.Extensions.Meta;
 using Penguin.Reflection.Serialization.Abstractions.Interfaces;
-using Penguin.Reflection.Serialization.Objects;
 
 namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Models
 {
@@ -8,7 +8,7 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Models
     {
         public string Name { get; set; } = string.Empty;
         public bool Optimized { get; set; }
-        public MetaObject? Parameters { get; set; }
+        public DbMetaObject? Parameters { get; set; }
 
         public PagedListContainer<IMetaObject>? Results { get; set; }
     }

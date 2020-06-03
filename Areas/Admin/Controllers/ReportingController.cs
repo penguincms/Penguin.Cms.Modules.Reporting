@@ -14,8 +14,10 @@ using Penguin.Persistence.Database;
 using Penguin.Persistence.Database.Extensions;
 using Penguin.Persistence.Database.Objects;
 using Penguin.Persistence.Database.Serialization.Extensions;
+using Penguin.Persistence.Database.Serialization.Extensions.Meta;
 using Penguin.Reflection.Dynamic;
 using Penguin.Reflection.Serialization.Abstractions.Interfaces;
+using Penguin.Reflection.Serialization.Abstractions.Wrappers;
 using Penguin.Reflection.Serialization.Constructors;
 using Penguin.Reflection.Serialization.Objects;
 using Penguin.Security.Abstractions.Interfaces;
@@ -118,9 +120,7 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
         {
             List<SQLParameterInfo> parameters = this.ReportingDatabase.GetParameters(Name);
 
-            MetaObject toRender = parameters.ToMetaObject();
-
-            toRender.Hydrate();
+            DbMetaObject toRender = parameters.ToMetaObject();
 
             StoredProcedureDisplayModel model = new StoredProcedureDisplayModel
             {
@@ -135,7 +135,7 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
 
                 foreach (JProperty jtok in jObject.Properties())
                 {
-                    ((MetaObject)model.Parameters[jtok.Name]).Value = jtok.Value.ToString();
+                    model.Parameters[jtok.Name].Value = jtok.Value.ToString();
                 }
             }
 
@@ -147,8 +147,8 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
 
             if (model.Parameters.HasProperty("@page") && model.Parameters.HasProperty("@count"))
             {
-                ((MetaObject)model.Parameters["@page"]).Value = $"{page}";
-                ((MetaObject)model.Parameters["@count"]).Value = $"{count}";
+                model.Parameters["@page"].Value = $"{page}";
+                model.Parameters["@count"].Value = $"{count}";
                 model.Results.Items.AddRange(this.ReportingDatabase.ExecuteStoredProcedureToTable(Name, model.Parameters.ToSqlParameters()).ToMetaObject().Cast<IMetaObject>());
             }
             else
@@ -166,7 +166,7 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
         {
             List<SQLParameterInfo> parameters = this.ReportingDatabase.GetParameters(Name);
 
-            MetaObject toRender = parameters.ToMetaObject();
+            DbMetaObject toRender = parameters.ToMetaObject();
 
             foreach (SQLParameterInfo thisParam in parameters)
             {
@@ -177,7 +177,7 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
                 {
                     if (DBInstance.Default != null)
                     {
-                        ((MetaObject)toRender[thisParam.PARAMETER_NAME]).Value = this.GetParamConstraint(DBInstance.Default, netType);
+                        toRender[thisParam.PARAMETER_NAME].Value = this.GetParamConstraint(DBInstance.Default, netType);
                     }
 
                     if (DBInstance.MinValue is null)
@@ -209,29 +209,30 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
 
                         MetaConstructor c = new MetaConstructor();
 
-                        MetaObject instance = new MetaObject(range, c);
-
-                        MetaAttribute toAdd = new MetaAttribute(-1)
+                        DbMetaObject instance = new DbMetaObject()
                         {
-                            Type = new MetaType(typeof(RangeAttribute), instance.Properties),
-                            Instance = instance
+                            Properties = new List<DbMetaObject>()
+                            {
+                                new DbMetaObject()
+                                {
+                                    Value = range.Minimum.ToString(),
+                                    Property = new DbMetaProperty()
+                                }
+                            }
                         };
 
-                        instance.RegisterConstructor(c);
+                        MetaAttributeHolder toAdd = new MetaAttributeHolder(range, false);
+
                         instance.Type = toAdd.Type;
 
-                        instance.Hydrate();
-
-                        IList<IMetaAttribute> existingAttributes = toRender[thisParam.PARAMETER_NAME].Property.Attributes.ToList();
+                        List<IMetaAttribute> existingAttributes = toRender[thisParam.PARAMETER_NAME].Property.Attributes.ToList();
 
                         existingAttributes.Add(toAdd);
 
-                        ((MetaProperty)toRender[thisParam.PARAMETER_NAME].Property).Attributes = existingAttributes;
+                        toRender[thisParam.PARAMETER_NAME].Property.Attributes = existingAttributes;
                     }
                 }
             }
-
-            toRender.Hydrate();
 
             StoredProcedureDisplayModel model = new StoredProcedureDisplayModel
             {

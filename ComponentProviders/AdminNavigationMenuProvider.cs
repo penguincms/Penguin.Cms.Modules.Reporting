@@ -24,7 +24,7 @@ namespace Penguin.Cms.Modules.Reporting.ComponentProviders
                              Href = "/Admin/Reporting/Index",
                              Permissions = new List<ISecurityGroupPermission>()
                              {
-                                 this.CreatePermission(SecurityRoles.SYS_ADMIN, PermissionTypes.Read | PermissionTypes.Write)
+                                 CreatePermission(SecurityRoles.SYS_ADMIN, PermissionTypes.Read | PermissionTypes.Write)
                              }
                          }
                     }

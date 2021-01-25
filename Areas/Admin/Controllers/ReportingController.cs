@@ -19,7 +19,6 @@ using Penguin.Reflection.Dynamic;
 using Penguin.Reflection.Serialization.Abstractions.Interfaces;
 using Penguin.Reflection.Serialization.Abstractions.Wrappers;
 using Penguin.Reflection.Serialization.Constructors;
-using Penguin.Reflection.Serialization.Objects;
 using Penguin.Security.Abstractions.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -59,7 +58,6 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters")]
         public ActionResult EditParameter(ParameterEditDisplayModel model)
         {
             if (model is null)
@@ -161,7 +159,6 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
             return this.View(model);
         }
 
-        [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters")]
         public ActionResult StoredProcedure(string Name)
         {
             List<SQLParameterInfo> parameters = this.ReportingDatabase.GetParameters(Name);

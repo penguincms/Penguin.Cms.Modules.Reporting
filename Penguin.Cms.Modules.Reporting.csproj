@@ -17,7 +17,7 @@
     <PackageReference Include="Penguin.Reflection.Dynamic" Version="5.0.2-TA9KKLU" />
     <PackageReference Include="Penguin.Cms.Reporting" Version="5.0.2-TAA4YFP" />
     <PackageReference Include="Penguin.Persistence.Database.Serialization.Extensions" Version="5.0.2-TAA4YFP" />
-    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="5.0.2-TAA4YFP" />
+    <PackageReference Include="Penguin.Cms.Modules.Dynamic" Version="5.0.2-TAAG11Z" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\**\*" />

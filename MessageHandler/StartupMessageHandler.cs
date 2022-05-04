@@ -23,7 +23,7 @@ namespace Penguin.Cms.Modules.Reporting.MessageHandler
 
             if (string.IsNullOrWhiteSpace(ReportingString))
             {
-                this.ConfigurationProvider.SetConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING, this.ConnectionInfo.ConnectionString);
+                _ = this.ConfigurationProvider.SetConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING, this.ConnectionInfo.ConnectionString);
             }
         }
     }

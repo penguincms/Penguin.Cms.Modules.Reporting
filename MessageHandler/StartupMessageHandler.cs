@@ -13,17 +13,17 @@ namespace Penguin.Cms.Modules.Reporting.MessageHandler
 
         public StartupMessageHandler(IProvideConfigurations configurationProvider, PersistenceConnectionInfo connectionInfo)
         {
-            this.ConfigurationProvider = configurationProvider;
-            this.ConnectionInfo = connectionInfo;
+            ConfigurationProvider = configurationProvider;
+            ConnectionInfo = connectionInfo;
         }
 
         public void AcceptMessage(Startup message)
         {
-            string ReportingString = this.ConfigurationProvider.GetConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING);
+            string ReportingString = ConfigurationProvider.GetConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING);
 
             if (string.IsNullOrWhiteSpace(ReportingString))
             {
-                _ = this.ConfigurationProvider.SetConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING, this.ConnectionInfo.ConnectionString);
+                _ = ConfigurationProvider.SetConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING, ConnectionInfo.ConnectionString);
             }
         }
     }

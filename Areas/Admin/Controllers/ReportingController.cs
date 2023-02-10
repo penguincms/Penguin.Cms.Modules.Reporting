@@ -34,25 +34,25 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
 
         public ReportingController(IProvideConfigurations configurationService, IRepository<ParameterInfo> reportingParameterRepository, System.IServiceProvider serviceProvider, IUserSession userSession) : base(serviceProvider, userSession)
         {
-            this.ConfigurationService = configurationService;
-            this.ReportingDatabase = new DatabaseInstance(this.ConfigurationService.ConnectionStringOrConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING));
-            this.ReportingParameterRepository = reportingParameterRepository;
+            ConfigurationService = configurationService;
+            ReportingDatabase = new DatabaseInstance(ConfigurationService.ConnectionStringOrConfiguration(ConfigurationNames.CONNECTION_STRINGS_REPORTING));
+            ReportingParameterRepository = reportingParameterRepository;
         }
 
         [HttpGet]
         public ActionResult EditParameter(string Name, string Parameter)
         {
-            ParameterEditDisplayModel model = new ParameterEditDisplayModel()
+            ParameterEditDisplayModel model = new()
             {
-                ParameterInfo = this.ReportingParameterRepository.GetByProcedureAndName(Name, Parameter) ?? new ParameterInfo()
+                ParameterInfo = ReportingParameterRepository.GetByProcedureAndName(Name, Parameter) ?? new ParameterInfo()
                 {
                     ParameterName = Parameter,
                     ProcedureName = Name
                 },
-                SQLParameterInfo = this.ReportingDatabase.GetParameters(Name).First(p => p.PARAMETER_NAME == Parameter)
+                SQLParameterInfo = ReportingDatabase.GetParameters(Name).First(p => p.PARAMETER_NAME == Parameter)
             };
 
-            return this.View(model);
+            return View(model);
         }
 
         [HttpPost]
@@ -68,11 +68,11 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
                 throw new NullReferenceException("ParameterInfo can not be null");
             }
 
-            using (this.ReportingParameterRepository.WriteContext())
+            using (ReportingParameterRepository.WriteContext())
             {
-                model.SQLParameterInfo = this.ReportingDatabase.GetParameters(model.ParameterInfo.ProcedureName).First(p => p.PARAMETER_NAME == model.ParameterInfo.ParameterName);
+                model.SQLParameterInfo = ReportingDatabase.GetParameters(model.ParameterInfo.ProcedureName).First(p => p.PARAMETER_NAME == model.ParameterInfo.ParameterName);
 
-                ParameterInfo existing = this.ReportingParameterRepository.GetByProcedureAndName(model.ParameterInfo.ProcedureName, model.ParameterInfo.ParameterName);
+                ParameterInfo existing = ReportingParameterRepository.GetByProcedureAndName(model.ParameterInfo.ProcedureName, model.ParameterInfo.ParameterName);
 
                 if (existing is null)
                 {
@@ -85,10 +85,10 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
                     existing.Default = model.ParameterInfo.Default;
                 }
 
-                this.ReportingParameterRepository.AddOrUpdate(existing);
+                ReportingParameterRepository.AddOrUpdate(existing);
             }
 
-            return this.View(model);
+            return View(model);
         }
 
         public string? GetParamConstraint(ParameterConstraint source, System.Type type)
@@ -98,27 +98,20 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
                 return null;
             }
 
-            if (source.Type == ParameterConstraint.ConstraintType.Static)
-            {
-                return source.Value;
-            }
-            else if (source.Type == ParameterConstraint.ConstraintType.SQL)
-            {
-                return this.ReportingDatabase.ExecuteToTable(source.Value).GetSingle<string>();
-            }
-            else
-            {
-                return CodeGenerator.Execute(source.Value, type)?.ToString();
-            }
+            return source.Type == ParameterConstraint.ConstraintType.Static
+                ? source.Value
+                : source.Type == ParameterConstraint.ConstraintType.SQL
+                    ? ReportingDatabase.ExecuteToTable(source.Value).GetSingle<string>()
+                    : (CodeGenerator.Execute(source.Value, type)?.ToString());
         }
 
         public ActionResult RunStoredProcedure(string Name, string json, int count = 20, int page = 0)
         {
-            List<SQLParameterInfo> parameters = this.ReportingDatabase.GetParameters(Name);
+            List<SQLParameterInfo> parameters = ReportingDatabase.GetParameters(Name);
 
             DbMetaObject toRender = parameters.ToMetaObject();
 
-            StoredProcedureDisplayModel model = new StoredProcedureDisplayModel
+            StoredProcedureDisplayModel model = new()
             {
                 Name = Name,
                 Parameters = toRender,
@@ -145,34 +138,34 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
             {
                 model.Parameters["@page"].Value = $"{page}";
                 model.Parameters["@count"].Value = $"{count}";
-                model.Results.Items.AddRange(this.ReportingDatabase.ExecuteStoredProcedureToTable(Name, model.Parameters.ToSqlParameters()).ToMetaObject().Cast<IMetaObject>());
+                model.Results.Items.AddRange(ReportingDatabase.ExecuteStoredProcedureToTable(Name, model.Parameters.ToSqlParameters()).ToMetaObject().Cast<IMetaObject>());
             }
             else
             {
-                List<IMetaObject> results = this.ReportingDatabase.ExecuteStoredProcedureToTable(Name, model.Parameters.ToSqlParameters()).ToMetaObject().Cast<IMetaObject>().ToList();
+                List<IMetaObject> results = ReportingDatabase.ExecuteStoredProcedureToTable(Name, model.Parameters.ToSqlParameters()).ToMetaObject().Cast<IMetaObject>().ToList();
                 model.Results.TotalCount = results.Count;
                 model.Results.Items.AddRange(results.Skip(page * count).Take(count));
             }
 
-            return this.View(model);
+            return View(model);
         }
 
         public ActionResult StoredProcedure(string Name)
         {
-            List<SQLParameterInfo> parameters = this.ReportingDatabase.GetParameters(Name);
+            List<SQLParameterInfo> parameters = ReportingDatabase.GetParameters(Name);
 
             DbMetaObject toRender = parameters.ToMetaObject();
 
             foreach (SQLParameterInfo thisParam in parameters)
             {
-                ParameterInfo DBInstance = this.ReportingParameterRepository.GetByProcedureAndName(Name, thisParam.PARAMETER_NAME);
+                ParameterInfo DBInstance = ReportingParameterRepository.GetByProcedureAndName(Name, thisParam.PARAMETER_NAME);
                 System.Type netType = TypeConverter.ToNetType(thisParam.DATA_TYPE);
 
                 if (DBInstance != null)
                 {
                     if (DBInstance.Default != null)
                     {
-                        toRender[thisParam.PARAMETER_NAME].Value = this.GetParamConstraint(DBInstance.Default, netType);
+                        toRender[thisParam.PARAMETER_NAME].Value = GetParamConstraint(DBInstance.Default, netType);
                     }
 
                     if (DBInstance.MinValue is null)
@@ -192,19 +185,19 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
 
                         if (DBInstance.MinValue.Enabled)
                         {
-                            Min = this.GetParamConstraint(DBInstance.MinValue, netType);
+                            Min = GetParamConstraint(DBInstance.MinValue, netType);
                         }
 
                         if (DBInstance.MaxValue.Enabled)
                         {
-                            Max = this.GetParamConstraint(DBInstance.MaxValue, netType);
+                            Max = GetParamConstraint(DBInstance.MaxValue, netType);
                         }
 
-                        RangeAttribute range = new RangeAttribute(netType, Min, Max);
+                        RangeAttribute range = new(netType, Min, Max);
 
-                        MetaConstructor c = new MetaConstructor();
+                        MetaConstructor c = new();
 
-                        DbMetaObject instance = new DbMetaObject()
+                        DbMetaObject instance = new()
                         {
                             Properties = new List<DbMetaObject>()
                             {
@@ -216,7 +209,7 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
                             }
                         };
 
-                        MetaAttributeHolder toAdd = new MetaAttributeHolder(range, false);
+                        MetaAttributeHolder toAdd = new(range, false);
 
                         instance.Type = toAdd.Type;
 
@@ -229,14 +222,14 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
                 }
             }
 
-            StoredProcedureDisplayModel model = new StoredProcedureDisplayModel
+            StoredProcedureDisplayModel model = new()
             {
                 Name = Name,
                 Parameters = toRender,
                 Optimized = parameters.Any(p => p.PARAMETER_NAME == "count") && parameters.Any(p => p.PARAMETER_NAME == "page")
             };
 
-            return this.View(model);
+            return View(model);
         }
     }
 }

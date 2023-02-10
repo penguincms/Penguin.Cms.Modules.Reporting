@@ -9,6 +9,7 @@ namespace Penguin.Cms.Modules.Reporting.MessageHandler
     public class StartupMessageHandler : IMessageHandler<Startup>
     {
         protected IProvideConfigurations ConfigurationProvider { get; set; }
+
         protected PersistenceConnectionInfo ConnectionInfo { get; set; }
 
         public StartupMessageHandler(IProvideConfigurations configurationProvider, PersistenceConnectionInfo connectionInfo)

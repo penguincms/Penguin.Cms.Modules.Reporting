@@ -28,6 +28,7 @@ namespace Penguin.Cms.Modules.Reporting.Areas.Admin.Controllers
     public class ReportingController : AdminController
     {
         private readonly DatabaseInstance ReportingDatabase;
+
         protected IProvideConfigurations ConfigurationService { get; set; }
 
         protected IRepository<ParameterInfo> ReportingParameterRepository { get; set; }
